@@ -20,7 +20,7 @@
 
 ## 2. BxE项目概述
 ### 2.1 项目目标
-BxE旨在充分利用比特币强大的安全性、去中心化特性和庞大的网络效应,在其基础上构建一个可编程、跨生态互联的新一代区块链生态系统。通过创新的技术设计,BxE将成为连接比特币与以太坊Web3生态网络的桥梁,推动整个加密经济的发展。
+**BxE协议(Bitcoin x Ethereum Protocol)** 旨在充分利用比特币强大的安全性、去中心化特性和庞大的网络效应,在其基础上构建一个可编程、跨生态互联的新一代区块链生态系统。通过创新的技术设计,BxE将成为连接比特币与以太坊Web3生态网络的桥梁,推动整个加密经济的发展。
 
 ### 2.2 关键创新
 基于Ordinals协议,创新性地将以太坊EVM迁移到比特币网络上运行,实现了以太坊dApp与比特币网络的无缝集成。
@@ -123,7 +123,7 @@ contract BRC20 {
 ```
 
 #### 3.5.4 BTC-ERC20合约
-Bitcoin ERC20合约是Bitcoin的Wrapped形式并满足ERC20接口标准，当BTC在比特币网络销毁时，该合约则可Mint出对应数量的WBTC。
+Bitcoin ERC20合约又称WBTC合约，是Bitcoin的Wrapped形式并满足ERC20接口标准，当BTC在比特币网络销毁时，该合约则可Mint出对应数量的WBTC。
 合约地址：0x0000000000000000000000000000000000000004
 ```solidity
 contract BitcoinERC20 {
@@ -174,6 +174,7 @@ BXET(Bitcoin x Ethereum Virtual Machine Token简称BXET)是BxE协议与生态系
 ### 3.8 BxE对以太坊生态的兼容性
 BxE协议对外提供与以太坊JSON-RPC接口兼容的网关服务,用户可以通过该网关查询BxE节点上的合约状态和执行结果。
 ![](./image/BxE-Web3-Ecosystem.png)
+
 这种设计带来的主要优势是:
 
 充分利用了比特币网络出色的安全性、去中心化程度和全球共识,使得合约执行的数据源具有很高的可靠性和确定性。
@@ -202,11 +203,12 @@ BXET将作为BxE平台内部的Gas费用支付通证,用于支付智能合约部
 
 ## 5. BxE生态发展路线图
 ### 5.1 开发路线图
-BxE的技术开发将分为四个阶段:
+BxE的技术开发将分为以下几个阶段:
 * 第一阶段研发BxEVM虚拟机，支持在BxEVM上运行任意EVM兼容智能合约;
 * 第二阶段研发兼容以太坊生态的Jsonrpc网关和钱包，实现智能合约的部署与调用交易的上链;
 * 第三阶段研发系统合约，打通比特币网络上的BTC交易、Ordinals铭文、BRC-20等生态;
 * 第四阶段打造完整的BxE生态，迁移成熟的以太坊Web3生态，引入预言机、ZKRollup等机制，实现高吞吐量和低成本的智能合约执行。
+* 第五阶段支持原生Rollup，将用户的BxE交易进行Rollup，批量打包上链到比特币网络，从而实现更高的吞吐量和更低的成本。
 
 ### 5.2 生态拓展计划
 BxE项目将着力在比特币网络上打通现有的铭文、BRC-20等生态，促进比特币生态资产的流通，并进一步打造一个充满活力的dApp生态,涵盖DeFi借贷、DEX交易所、NFT市场、GameFi、SocialFi等多种应用范畴。项目方将为优质项目提供BXET代币的生态基金支持,并有机会参与BxE的空投和激励机制。
@@ -259,7 +261,7 @@ BxE支持单向的BRC-20 Token转移到BxE协议上，以ERC20 Token的形式存
 WORDI的铸造逻辑如图：
 ```mermaid
 flowchart TD
-    Start((mint方法)) --> A
+    Start((WORDI合约\nmint方法)) --> A
     A{判断交易哈希} -->|已处理过| E[返回错误]
     A -->|未处理过| C[跨合约调用BRC-20查询合约getTransfer方法]
     C --> D{判断Token Symbol}
@@ -285,7 +287,7 @@ BxE支持单向的BTC转移到BxE协议上，以ERC20 Token（WBTC）的形式�
 WBTC的铸造逻辑如图：
 ```mermaid
 flowchart TD
-    Start((mint方法)) --> A
+    Start((WBTC合约\nmint方法)) --> A
     A{判断交易哈希} -->|已处理过| E[返回错误]
     A -->|未处理过| C[跨合约调用BTC查询合约getTransaction方法]
     C --> D{判断收款人地址}
