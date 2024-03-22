@@ -71,7 +71,7 @@ BxE节点通过连接比特币官方钱包或者运营商的RPC服务监听比�
 
 ![](./image/SegWitScript2EthTx.png)
 
-### 3.4 BxEVM以太坊交易的执行与结果存储
+### 3.4 BxEVM以太坊交易的执行
 BxEVM是BxE协议的核心组件,它是一个以太坊虚拟机的实现,兼容最新版本以太坊主网的合约逻辑，用于执行以太坊交易中的智能合约。BxEVM的执行结果将被独立记录和存储,而不会写入比特币区块链。
 BxEVM的执行除了当前交易外，还需要从状态数据库中读取合约字节码、合约状态数据和用户账户数据，另外BxE协议还提供了比特币交易和区块到BxEVM所需的上下文的映射。BxEvm的执行结果包括合约执行的状态变更、执行结果、Gas消耗、事件日志等信息,这些信息将被存储在BxE节点的本地数据库中,并通过BxE网关服务对外提供查询接口。
 
@@ -149,6 +149,8 @@ contract BitcoinERC20 {
     function mint(bytes txHash) public returns (bool);
 }
 ```
+#### 3.5.5 状态共识质押合约
+
 ### 3.6 BxE Token的设计
 BXET(Bitcoin x Ethereum Virtual Machine Token简称BXET)是BxE协议与生态系统的核心加密数字资产,BXET在BxE协议上线时一次性发行完毕，BxEVM的执行过程中扮演了重要的角色,主要用于支付智能合约部署、合约调用、BXET转账等的手续费。
 为了保证BxE与以太坊的兼容性，BXET与以太坊Gas费用的设计保持一致,即用户在BxE上执行智能合约时,需要支付一定数量的BXET作为手续费。BXET做为手续费直接销毁,不会进入任何人的账户。
