@@ -125,15 +125,23 @@ BxE平台将预置诸如比特币查询、Ordinals查询、BRC-20查询等一系
 合约地址：0x0000000000000000000000000000000000000081
 
 ```solidity
-contract Bitcoin {
-    //getBlockHeader 根据传入的区块高度获取比特币区块头
-    function getBlockHeader(uint256 height) public view returns (bytes memory);
-    //getTransaction 根据传入的交易ID获取比特币交易
-    function getTransaction(uint256 txid) public view returns (bytes memory);
-    //getBalance 根据传入的地址获取比特币余额
-    function getBalance(address addr) public view returns (uint256);
-    //getUtxo 根据传入的地址获取其比特币UTXO列表
-    function getUtxo(address addr) public view returns (bytes memory);
+interface Bitcoin {
+    // getBlockHeader 根据区块高度查询区块头
+    function getBlockHeader(uint256 height) external view returns (bytes32 blockHash, uint256 timestamp, bytes memory);
+    // getTransaction 根据交易ID查询交易
+    function getTransaction(bytes32 txid) external view returns (bytes memory);
+    // getBalance 检索地址的余额
+    function getBalance(string memory addr) external view returns (uint256);
+    // getUtxo 根据地址查询UTXO
+    function getUtxo(string memory addr) external view returns (bytes memory);
+    // getTxFrom 根据交易ID和索引获取比特币交易输入的地址和金额
+    function getTxFrom(bytes32 txid, uint256 index) external view returns (string memory,uint256);
+    // getTxTo 根据交易ID和索引获取比特币交易输出的地址和金额
+    function getTxTo(bytes32 txid, uint256 index) external view returns (string memory,uint256);
+    // getTxToList 根据交易ID获取比特币交易输出的地址和金额
+    function getTxToList(bytes32 txid) external view returns (string[] memory, uint256[] memory) ;
+    // isFromPubKey 验证交易是否来自指定的公钥
+    function isFromPubKey(bytes32 txid, string memory pubKeyHex) external view returns (bool);
 }
 ```
 
@@ -143,15 +151,15 @@ Ordinals管理合约允许用户查询、验证、解析比特币区块中的Ord
 合约地址：0x0000000000000000000000000000000000000082
 
 ```solidity
-contract Ordinals {
+interface Ordinals {
     //getInscriptionById 根据传入的铭文ID获取铭文信息，包括铭文对应聪编号、铭文内容、大小、创建时间、创建高度、创建者、当前拥有者等 
-    function getInscriptionById(uint256 inscriptionId) public view returns (bytes memory);
+    function getInscriptionById(uint256 inscriptionId) external view returns (bytes memory);
     //getInscriptionBySatNumber 根据传入的聪编号获取铭文信息
-    function getInscriptionBySatNumber(uint256 satNumber) public view returns (bytes memory);
+    function getInscriptionBySatNumber(uint256 satNumber) external view returns (bytes memory);
     //getCollection 根据传入的序号获取铭文集合 
-    function getCollection(uint256 ordinal) public view returns (bytes memory);
+    function getCollection(uint256 ordinal) external view returns (bytes memory);
     //getInscriptionTransaction 根据传入的交易ID获取铭文交易信息
-    function getInscriptionTransfer(bytes txHash) public view returns (address from, address to, uint256 satNumber, bytes txData);
+    function getInscriptionTransfer(bytes32 txHash) external view returns (string memory from, string memory to, uint256 satNumber, bytes memory txData);
 }
 ```
 
@@ -161,13 +169,13 @@ BRC-20合约是Ordinals上的代币标准,允许用户定义、发行、转账�
 合约地址：0x0000000000000000000000000000000000000083
 
 ```solidity
-contract BRC20 {
+interface BRC20 {
     //getDeploy 根据传入的交易ID获取代币部署信息，包括代币名称、总发行量、单次挖矿限额等
-    function getDeploy(bytes txHash) public view returns (string token, uint256 totalSupply,uint256 limit);
+    function getDeploy(bytes32 txHash) external view returns (string memory token, uint256 totalSupply,uint256 limit);
     //getMint  根据传入的交易ID获取代币铸币信息，包括代币名称、铸币者、铸币数量
-    function getMint(bytes txHash) public view returns (string token,address owner, uint256 value);
+    function getMint(bytes32 txHash) external view returns (string memory token,string memory owner, uint256 value);
     //getTransfer 根据传入的交易ID获取代币转账信息，包括代币名称、转出地址、转入地址、转账数量
-    function getTransfer( bytes txHash) public view returns (string token,address from, address to, uint256 value);
+    function getTransfer( bytes32 txHash) external view returns (string memory token,string memory from, string memory to, uint256 value);
 }
 ```
 
@@ -177,22 +185,22 @@ Bitcoin ERC20合约又称WBTC合约，是Bitcoin的Wrapped形式并满足ERC20�
 合约地址：0x0000000000000000000000000000000000000084
 
 ```solidity
-contract BitcoinERC20 {
+interface BitcoinERC20 {
     //满足ERC20
-    function name() public view returns (string);
-    function symbol() public view returns (string);
-    function decimals() public view returns (uint8);
-    function totalSupply() public view returns (uint256);
-    function balanceOf(address account) public view returns (uint256);
-    function transfer(address recipient, uint256 amount) public returns (bool);
-    function allowance(address owner, address spender) public view returns (uint256);
-    function approve(address spender, uint256 amount) public returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool);
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+    function decimals() external view returns (uint8);
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     //Event
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    //mint 传入锁定BTC的交易哈希，系统判断从比特币网络锁定的BTC后，可在BxE上铸造对应数量的WBTC
-    function mint(bytes txHash) public returns (bool);
+    //mint 传入锁定BTC的交易哈希，以及用户的公钥，系统判断从比特币网络锁定的BTC后，可在BxE上铸造对应数量的WBTC给对应的公钥所在的账户
+    function mint(bytes32 txHash,string memory pubkeyHex) external returns (bool);
 }
 ```
 
@@ -204,7 +212,7 @@ contract BitcoinERC20 {
 合约地址：0x0000000000000000000000000000000000000085
 
 ```solidity
-contract Pos {
+interface Pos {
     //stake 质押BXET,成为验证者
     function stake() external;
     //unstake 申请解除质押BXET
@@ -377,7 +385,7 @@ BxE的技术开发将分为以下几个阶段:
 
 * 第一阶段研发BxEVM虚拟机，支持在BxEVM上运行任意EVM兼容智能合约;
 * 第二阶段研发兼容以太坊生态的Jsonrpc网关和钱包，实现智能合约的部署与调用交易的上链;
-* 第三阶段研发系统合约，打通比特币网络上的BTC交易、Ordinals铭文、BRC-20等生态;
+* 第三阶段研发系统合约，打通比特币网络上的BTC交易、Ordinals铭文、BRC-20、Runes等生态;
 * 第四阶段打造完整的BxE生态，迁移成熟的以太坊Web3生态，引入预言机、ZKRollup等机制，实现高吞吐量和低成本的智能合约执行。
 * 第五阶段支持原生Rollup，将用户的BxE交易进行Rollup，批量打包上链到比特币网络，从而实现更高的吞吐量和更低的成本。
 
